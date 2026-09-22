@@ -1,0 +1,145 @@
+:root{
+    --bg:#050705;
+    --card:#0d1410;
+    --green:#39ff88;
+    --text:#eefef3;
+    --muted:#7d8b82;
+    --border:rgba(57,255,136,.15);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Segoe UI;
+    background:var(--bg);
+    color:var(--text);
+}
+
+.app{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.header{
+    padding:20px 0;
+}
+
+.logo{
+    width:55px;
+    height:55px;
+    border-radius:15px;
+    background:var(--green);
+    color:black;
+    display:grid;
+    place-items:center;
+    font-size:30px;
+}
+
+.brand{
+    display:flex;
+    gap:15px;
+    align-items:center;
+}
+
+.brand h1{
+    color:var(--green);
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin-top:20px;
+}
+
+.stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:20px;
+    border-radius:20px;
+    text-align:center;
+}
+
+.stat strong{
+    color:var(--green);
+    font-size:30px;
+}
+
+.day-tabs{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.day-tabs button{
+    background:var(--card);
+    color:var(--green);
+    border:1px solid var(--border);
+    padding:15px;
+    border-radius:15px;
+}
+
+.exercise{
+    background:var(--card);
+    border:1px solid var(--border);
+    padding:20px;
+    border-radius:20px;
+    margin-top:15px;
+}
+
+.set{
+    display:grid;
+    grid-template-columns:40px 1fr 1fr;
+    gap:10px;
+    margin-top:10px;
+}
+
+input{
+    background:#081009;
+    color:white;
+    border:1px solid var(--border);
+    padding:12px;
+    border-radius:10px;
+}
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#0a0f0b;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+}
+
+.bottom-nav button{
+    background:none;
+    color:var(--green);
+    border:0;
+    padding:15px;
+}
+
+.toast{
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#111;
+    color:var(--green);
+    padding:15px;
+    border-radius:15px;
+    display:none;
+}
