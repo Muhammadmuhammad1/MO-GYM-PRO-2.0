@@ -1,296 +1,187 @@
 /* =========================================================
-   MO GYM PRO 2.0
-   FINAL APP.JS
+   MO GYM PRO
+   Complete Workout Tracker
 ========================================================= */
+
+const STORAGE_KEY = "MO_GYM_PRO";
+
+const routines = {
+
+    "Torso A": [
+        ["Incline Dumbbell Press", 3, "8–10", "Chest"],
+        ["Flat Barbell Bench Press", 3, "6–10", "Chest"],
+        ["Lat Pulldown", 3, "8–12", "Back"],
+        ["Chest Supported Row", 3, "8–12", "Back"],
+        ["Dumbbell Lateral Raise", 3, "12–15", "Shoulders"],
+        ["EZ-Bar Curl", 2, "8–12", "Biceps"],
+        ["Cable Triceps Pushdown", 2, "10–15", "Triceps"]
+    ],
+
+    "Limbs A": [
+        ["Squat", 3, "6–10", "Quads"],
+        ["Leg Press", 2, "10–15", "Quads"],
+        ["Leg Extension", 2, "10–15", "Quads"],
+        ["Romanian Deadlift", 3, "8–12", "Hamstrings"],
+        ["Leg Curl", 2, "10–15", "Hamstrings"],
+        ["Incline Dumbbell Curl", 2, "8–12", "Biceps"],
+        ["Overhead Cable Triceps", 2, "10–15", "Triceps"],
+        ["Standing Calf Raise", 3, "10–15", "Calves"]
+    ],
+
+    "Torso B": [
+        ["Flat Barbell Bench Press", 3, "6–10", "Chest"],
+        ["Incline Machine Press", 3, "8–12", "Chest"],
+        ["Lat Pulldown", 3, "8–12", "Back"],
+        ["Seated Cable Row", 3, "8–12", "Back"],
+        ["Dumbbell Shoulder Press", 2, "8–12", "Shoulders"],
+        ["Cable Lateral Raise", 3, "12–15", "Shoulders"],
+        ["Reverse Pec Deck", 2, "12–15", "Rear Delts"],
+        ["EZ-Bar Curl", 2, "8–12", "Biceps"],
+        ["Cable Triceps Pushdown", 2, "10–15", "Triceps"]
+    ],
+
+    "Limbs B": [
+        ["Hack Squat", 3, "8–12", "Quads"],
+        ["Bulgarian Split Squat", 2, "8–12", "Quads"],
+        ["Leg Extension", 2, "10–15", "Quads"],
+        ["Romanian Deadlift", 2, "8–12", "Hamstrings"],
+        ["Seated Leg Curl", 3, "10–15", "Hamstrings"],
+        ["EZ-Bar Curl", 3, "8–12", "Biceps"],
+        ["Skull Crushers", 3, "8–12", "Triceps"],
+        ["Seated Calf Raise", 3, "10–15", "Calves"]
+    ]
+};
 
 
 /* =========================================================
-   STORAGE
+   EXERCISE IMAGES
+   Put your cartoon illustrations inside /images
 ========================================================= */
 
-const STORAGE_KEY = "moGymPro20";
+const exerciseImages = {
+
+    "Incline Dumbbell Press": "images/incline-db-press.png",
+    "Flat Barbell Bench Press": "images/bench-press.png",
+    "Lat Pulldown": "images/lat-pulldown.png",
+    "Chest Supported Row": "images/chest-supported-row.png",
+    "Dumbbell Lateral Raise": "images/lateral-raise.png",
+    "EZ-Bar Curl": "images/ez-curl.png",
+    "Cable Triceps Pushdown": "images/triceps-pushdown.png",
+
+    "Squat": "images/squat.png",
+    "Leg Press": "images/leg-press.png",
+    "Leg Extension": "images/leg-extension.png",
+    "Romanian Deadlift": "images/rdl.png",
+    "Leg Curl": "images/leg-curl.png",
+    "Incline Dumbbell Curl": "images/incline-curl.png",
+    "Overhead Cable Triceps": "images/overhead-triceps.png",
+    "Standing Calf Raise": "images/calf-raise.png",
+
+    "Incline Machine Press": "images/incline-machine.png",
+    "Seated Cable Row": "images/cable-row.png",
+    "Dumbbell Shoulder Press": "images/shoulder-press.png",
+    "Cable Lateral Raise": "images/cable-lateral.png",
+    "Reverse Pec Deck": "images/reverse-pec-deck.png",
+
+    "Hack Squat": "images/hack-squat.png",
+    "Bulgarian Split Squat": "images/bulgarian.png",
+    "Seated Leg Curl": "images/seated-leg-curl.png",
+    "Skull Crushers": "images/skull-crushers.png",
+    "Seated Calf Raise": "images/seated-calf.png"
+};
+
+
+/* =========================================================
+   DATA
+========================================================= */
+
+let data = loadData();
+
+let currentDay = data.currentDay || "Torso A";
+
+let timerInterval = null;
+let timerTotal = 90;
+let timerRemaining = 90;
+
+let autoSaveTimeout = null;
 
 
 /* =========================================================
    DEFAULT DATA
 ========================================================= */
 
-const defaultData = {
+function defaultData() {
 
-  name: "Mohamed",
+    return {
+        currentDay: "Torso A",
 
-  weight: 79,
+        drafts: {},
 
-  goalWeight: 85,
+        workouts: [],
 
-  xp: 0,
+        weights: [],
 
-  level: 1,
+        prs: {},
 
-  streak: 0,
-
-  totalWorkouts: 0,
-
-  language: "en",
-
-  theme: "dark",
-
-  restTimer: 90,
-
-  selectedRoutine: "Torso A",
-
-  lastWorkoutDate: null,
-
-  history: [],
-
-  weightHistory: [],
-
-  photos: []
-
-};
+        prEvents: 0
+    };
+}
 
 
-let data = loadData();
-
+/* =========================================================
+   LOAD / SAVE
+========================================================= */
 
 function loadData() {
 
-  try {
+    try {
 
-    const saved = localStorage.getItem(STORAGE_KEY);
+        const saved = localStorage.getItem(STORAGE_KEY);
 
-    if (!saved) {
+        if (!saved) {
+            return defaultData();
+        }
 
-      return {
-        ...defaultData
-      };
+        return {
+            ...defaultData(),
+            ...JSON.parse(saved)
+        };
 
+    } catch (error) {
+
+        console.error(error);
+
+        return defaultData();
     }
-
-    return {
-      ...defaultData,
-      ...JSON.parse(saved)
-    };
-
-  } catch (error) {
-
-    console.error(error);
-
-    return {
-      ...defaultData
-    };
-
-  }
-
 }
 
 
-function saveData() {
+function persistData() {
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(data)
-  );
-
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
 }
 
 
 /* =========================================================
-   ROUTINES
-========================================================= */
-
-const routines = {
-
-  "Torso A": [
-
-    ["Incline Dumbbell Press", 3, "8–10", "Chest"],
-    ["Flat Barbell Bench Press", 3, "6–10", "Chest"],
-    ["Lat Pulldown", 3, "8–12", "Back"],
-    ["Chest Supported Row", 3, "8–12", "Back"],
-    ["Dumbbell Lateral Raise", 3, "12–15", "Shoulders"],
-    ["EZ-Bar Curl", 2, "8–12", "Biceps"],
-    ["Cable Triceps Pushdown", 2, "10–15", "Triceps"]
-
-  ],
-
-  "Limbs A": [
-
-    ["Squat", 3, "6–10", "Quads"],
-    ["Leg Press", 2, "10–15", "Quads"],
-    ["Leg Extension", 2, "10–15", "Quads"],
-    ["Romanian Deadlift", 3, "8–12", "Hamstrings"],
-    ["Leg Curl", 2, "10–15", "Hamstrings"],
-    ["Incline Dumbbell Curl", 2, "8–12", "Biceps"],
-    ["Overhead Cable Triceps", 2, "10–15", "Triceps"],
-    ["Standing Calf Raise", 3, "10–15", "Calves"]
-
-  ],
-
-  "Torso B": [
-
-    ["Flat Barbell Bench Press", 3, "6–10", "Chest"],
-    ["Incline Machine Press", 3, "8–12", "Chest"],
-    ["Lat Pulldown", 3, "8–12", "Back"],
-    ["Seated Cable Row", 3, "8–12", "Back"],
-    ["Dumbbell Shoulder Press", 2, "8–12", "Shoulders"],
-    ["Cable Lateral Raise", 3, "12–15", "Shoulders"],
-    ["Reverse Pec Deck", 2, "12–15", "Rear Delts"],
-    ["EZ-Bar Curl", 2, "8–12", "Biceps"],
-    ["Cable Triceps Pushdown", 2, "10–15", "Triceps"]
-
-  ],
-
-  "Limbs B": [
-
-    ["Hack Squat", 3, "8–12", "Quads"],
-    ["Bulgarian Split Squat", 2, "8–12", "Quads"],
-    ["Leg Extension", 2, "10–15", "Quads"],
-    ["Romanian Deadlift", 2, "8–12", "Hamstrings"],
-    ["Seated Leg Curl", 3, "10–15", "Hamstrings"],
-    ["EZ-Bar Curl", 3, "8–12", "Biceps"],
-    ["Skull Crushers", 3, "8–12", "Triceps"],
-    ["Seated Calf Raise", 3, "10–15", "Calves"]
-
-  ]
-
-};
-
-
-/* =========================================================
-   EXERCISE IMAGES
-========================================================= */
-
-const exerciseImages = {
-
-  "Incline Dumbbell Press":
-    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=80",
-
-  "Flat Barbell Bench Press":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Lat Pulldown":
-    "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=500&q=80",
-
-  "Chest Supported Row":
-    "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=500&q=80",
-
-  "Dumbbell Lateral Raise":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "EZ-Bar Curl":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Cable Triceps Pushdown":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Squat":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Leg Press":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Leg Extension":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Romanian Deadlift":
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=500&q=80",
-
-  "Leg Curl":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Incline Dumbbell Curl":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Overhead Cable Triceps":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Standing Calf Raise":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Incline Machine Press":
-    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=500&q=80",
-
-  "Seated Cable Row":
-    "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=500&q=80",
-
-  "Dumbbell Shoulder Press":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Cable Lateral Raise":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Reverse Pec Deck":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Hack Squat":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Bulgarian Split Squat":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Seated Leg Curl":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80",
-
-  "Skull Crushers":
-    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=500&q=80",
-
-  "Seated Calf Raise":
-    "https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=500&q=80"
-
-};
-
-
-/* =========================================================
-   WORKOUT STATE
-========================================================= */
-
-let currentRoutine = data.selectedRoutine || "Torso A";
-
-let currentWorkout = [];
-
-
-/* =========================================================
-   TIMER STATE
-========================================================= */
-
-let timerInterval = null;
-
-let timerSeconds = Number(data.restTimer) || 90;
-
-let timerRemaining = timerSeconds;
-
-let timerRunning = false;
-
-
-/* =========================================================
-   INITIALIZATION
+   INIT
 ========================================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  applyTheme();
+    renderDashboard();
 
-  applyLanguage();
+    renderWorkout();
 
-  updateDashboard();
+    renderProgress();
 
-  renderWorkout();
+    renderHistory();
 
-  renderWeightHistory();
+    updateBottomNav();
 
-  renderPhotos();
-
-  renderWorkoutHistory();
-
-  initTimer();
-
-  calculateCalories();
-
-  const nameInput = document.getElementById("nameInput");
-
-  if (nameInput) {
-    nameInput.value = data.name;
-  }
+    setupInputListeners();
 
 });
 
@@ -299,261 +190,791 @@ document.addEventListener("DOMContentLoaded", () => {
    PAGE NAVIGATION
 ========================================================= */
 
-function showPage(pageId, navButton = null) {
+function showPage(pageId) {
 
-  document.querySelectorAll(".page")
-    .forEach(page => {
-      page.classList.remove("active");
+    document.querySelectorAll(".page").forEach(page => {
+
+        page.classList.remove("active");
+
     });
 
-  const page = document.getElementById(pageId);
+    const page = document.getElementById(pageId);
 
-  if (page) {
+    if (!page) return;
+
     page.classList.add("active");
-  }
 
+    updateBottomNav();
 
-  document.querySelectorAll(".nav-item")
-    .forEach(button => {
-      button.classList.remove("active");
-    });
-
-
-  if (navButton) {
-
-    navButton.classList.add("active");
-
-  } else {
-
-    const map = {
-      homePage: 0,
-      workoutPage: 1,
-      evolutionPage: 2,
-      caloriesPage: 3,
-      settingsPage: 4
-    };
-
-    const index = map[pageId];
-
-    if (index !== undefined) {
-
-      const buttons =
-        document.querySelectorAll(".nav-item");
-
-      if (buttons[index]) {
-        buttons[index].classList.add("active");
-      }
-
+    if (pageId === "dashboardPage") {
+        renderDashboard();
     }
 
-  }
+    if (pageId === "workoutPage") {
+        renderWorkout();
+    }
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+    if (pageId === "progressPage") {
+        renderProgress();
+    }
 
+    if (pageId === "historyPage") {
+        renderHistory();
+    }
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+function updateBottomNav() {
+
+    const activePage =
+        document.querySelector(".page.active")?.id;
+
+    document.querySelectorAll(".nav-item").forEach(btn => {
+
+        btn.classList.toggle(
+            "active",
+            btn.dataset.page === activePage
+        );
+
+    });
 }
 
 
 /* =========================================================
-   WORKOUT OPEN
+   DASHBOARD
 ========================================================= */
 
-function openWorkout(navButton = null) {
+function renderDashboard() {
 
-  showPage(
-    "workoutPage",
-    navButton
-  );
+    const workoutCount =
+        data.workouts.length;
 
-  renderWorkout();
+    const setCount =
+        data.workouts.reduce(
+            (sum, workout) =>
+                sum + (workout.totalSets || 0),
+            0
+        );
 
+    const prCount =
+        Object.keys(data.prs).length;
+
+    const latestWeight =
+        getLatestWeight();
+
+
+    document.getElementById("statWorkouts").textContent =
+        workoutCount;
+
+    document.getElementById("statPR").textContent =
+        prCount;
+
+    document.getElementById("statSets").textContent =
+        setCount;
+
+    document.getElementById("statWeight").textContent =
+        latestWeight ? latestWeight : "--";
+
+    document.getElementById("heroStreak").textContent =
+        calculateStreak();
+
+
+    const nextDay =
+        getNextWorkoutDay();
+
+    document.getElementById("nextWorkoutName").textContent =
+        nextDay;
+
+    document.getElementById("nextWorkoutType").textContent =
+        nextDay.includes("Torso")
+            ? "TORSO"
+            : "LIMBS";
+
+
+    const preview =
+        document.getElementById("previewExercises");
+
+    preview.innerHTML = "";
+
+    routines[nextDay]
+        .slice(0, 4)
+        .forEach(exercise => {
+
+            const item =
+                document.createElement("div");
+
+            item.className = "preview-item";
+
+            item.innerHTML = `
+                <span>${exercise[0]}</span>
+                <span>${exercise[1]} × ${exercise[2]}</span>
+            `;
+
+            preview.appendChild(item);
+        });
+
+
+    const challenge =
+        Math.min(workoutCount, 30);
+
+    const percent =
+        Math.round((challenge / 30) * 100);
+
+    document.getElementById("challengeBar")
+        .style.width = `${percent}%`;
+
+    document.getElementById("challengePercent")
+        .textContent = `${percent}%`;
+
+    document.getElementById("challengeText")
+        .textContent = `${challenge} / 30 تمرين`;
+}
+
+
+function getNextWorkoutDay() {
+
+    const order = [
+        "Torso A",
+        "Limbs A",
+        "Torso B",
+        "Limbs B"
+    ];
+
+    if (!data.workouts.length) {
+        return "Torso A";
+    }
+
+    const last =
+        data.workouts[data.workouts.length - 1].day;
+
+    const index =
+        order.indexOf(last);
+
+    return order[(index + 1) % order.length];
+}
+
+
+function startNextWorkout() {
+
+    currentDay =
+        getNextWorkoutDay();
+
+    data.currentDay =
+        currentDay;
+
+    persistData();
+
+    renderWorkout();
+
+    showPage("workoutPage");
+
+    showToast(
+        "🏋️",
+        `${currentDay} جاهز`
+    );
 }
 
 
 /* =========================================================
-   ROUTINE SELECT
+   WORKOUT DAY
 ========================================================= */
 
-function selectRoutine(name) {
+function changeWorkoutDay(day) {
 
-  if (!routines[name]) return;
+    saveWorkoutDraft(false);
 
-  currentRoutine = name;
+    currentDay = day;
 
-  data.selectedRoutine = name;
+    data.currentDay = day;
 
-  saveData();
+    persistData();
 
-  renderWorkout();
+    renderWorkout();
 
-  updateDashboard();
-
+    showToast(
+        "🏋️",
+        `تم اختيار ${day}`
+    );
 }
 
-
-/* =========================================================
-   RENDER WORKOUT
-========================================================= */
 
 function renderWorkout() {
 
-  const list =
-    document.getElementById("exerciseList");
+    currentDay =
+        data.currentDay || currentDay;
 
-  if (!list) return;
-
-  const title =
-    document.getElementById("workoutTitle");
-
-  if (title) {
-    title.textContent = currentRoutine;
-  }
+    document.getElementById("workoutDayTitle")
+        .textContent = currentDay;
 
 
-  document
-    .querySelectorAll("[data-routine]")
-    .forEach(button => {
+    document
+        .querySelectorAll(".day-selector button")
+        .forEach(button => {
 
-      button.classList.toggle(
-        "active",
-        button.dataset.routine === currentRoutine
-      );
+            button.classList.toggle(
+                "active",
+                button.dataset.day === currentDay
+            );
+
+        });
+
+
+    const routine =
+        routines[currentDay];
+
+    const draft =
+        getDraft(currentDay);
+
+
+    const totalSets =
+        routine.reduce(
+            (sum, ex) => sum + ex[1],
+            0
+        );
+
+
+    let completedSets = 0;
+
+    draft.exercises.forEach(exercise => {
+
+        exercise.sets.forEach(set => {
+
+            if (
+                Number(set.weight) > 0 &&
+                Number(set.reps) > 0 &&
+                set.done
+            ) {
+                completedSets++;
+            }
+
+        });
 
     });
 
 
-  const workout =
-    routines[currentRoutine] || [];
+    const percent =
+        totalSets
+            ? Math.round((completedSets / totalSets) * 100)
+            : 0;
 
 
-  currentWorkout = workout;
+    document.getElementById("sessionPercent")
+        .textContent = `${percent}%`;
+
+    document.getElementById("sessionSetsText")
+        .textContent =
+        `${completedSets} / ${totalSets} sets`;
+
+    document.getElementById("sessionProgressBar")
+        .style.width = `${percent}%`;
 
 
-  list.innerHTML = "";
+    const list =
+        document.getElementById("exerciseList");
+
+    list.innerHTML = "";
 
 
-  workout.forEach((exercise, exerciseIndex) => {
+    routine.forEach((exercise, exerciseIndex) => {
 
-    const [
-      name,
-      sets,
-      reps,
-      muscle
-    ] = exercise;
-
-
-    const image =
-      exerciseImages[name] || "";
+        const [
+            name,
+            setsCount,
+            repRange,
+            muscle
+        ] = exercise;
 
 
-    const card =
-      document.createElement("div");
-
-    card.className =
-      "exercise-card";
+        const savedExercise =
+            draft.exercises[exerciseIndex];
 
 
-    let setHTML = "";
+        const previous =
+            findPreviousPerformance(
+                name,
+                currentDay
+            );
 
 
-    for (
-      let set = 1;
-      set <= sets;
-      set++
-    ) {
-
-      setHTML += `
-
-        <div class="set-row">
-
-          <span>${set}</span>
-
-          <input
-            type="number"
-            step="0.5"
-            inputmode="decimal"
-            placeholder="kg"
-            data-exercise="${exerciseIndex}"
-            data-set="${set}"
-            class="weight-input">
-
-          <input
-            type="number"
-            inputmode="numeric"
-            placeholder="reps"
-            data-exercise="${exerciseIndex}"
-            data-set="${set}"
-            class="reps-input">
-
-          <span>${reps}</span>
-
-          <button
-            class="set-done"
-            onclick="toggleSetDone(this)">
-            ✓
-          </button>
-
-        </div>
-
-      `;
-
-    }
+        const suggestion =
+            getOverloadSuggestion(
+                name,
+                repRange,
+                previous
+            );
 
 
-    card.innerHTML = `
+        const card =
+            document.createElement("article");
 
-      <div class="exercise-head">
-
-        <img
-          class="exercise-image"
-          src="${image}"
-          alt="${name}"
-          loading="lazy">
-
-        <div class="exercise-main">
-
-          <strong>${name}</strong>
-
-          <small>
-            ${muscle} · ${sets} sets · ${reps}
-          </small>
-
-        </div>
-
-      </div>
-
-      <div class="exercise-sets">
-
-        ${setHTML}
-
-      </div>
-
-    `;
+        card.className =
+            "exercise-card";
 
 
-    list.appendChild(card);
+        const image =
+            exerciseImages[name];
 
-  });
 
+        const imageHTML = image
+
+            ? `
+                <img
+                    src="${image}"
+                    alt="${name}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"
+                >
+                <span
+                    class="exercise-placeholder"
+                    style="display:none"
+                >🏋️</span>
+              `
+
+            : `
+                <span class="exercise-placeholder">
+                    🏋️
+                </span>
+              `;
+
+
+        card.innerHTML = `
+
+            <div class="exercise-head">
+
+                <div class="exercise-thumb">
+                    ${imageHTML}
+                </div>
+
+                <div class="exercise-title">
+
+                    <h3>${name}</h3>
+
+                    <span>
+                        ${muscle} · ${setsCount} × ${repRange}
+                    </span>
+
+                </div>
+
+                <button
+                    class="rest-mini"
+                    onclick="startRestTimer(90)"
+                    title="Rest"
+                >
+                    ⏱
+                </button>
+
+            </div>
+
+
+            ${
+                previous
+                    ? `
+                        <div class="previous-performance">
+                            آخر مرة:
+                            <strong>
+                                ${previous}
+                            </strong>
+                        </div>
+                    `
+                    : ""
+            }
+
+
+            ${
+                suggestion
+                    ? `
+                        <div class="overload-tip">
+                            ⚡ ${suggestion}
+                        </div>
+                    `
+                    : ""
+            }
+
+
+            <div class="sets-container">
+
+                ${Array.from(
+                    { length: setsCount },
+                    (_, setIndex) => {
+
+                        const set =
+                            savedExercise.sets[setIndex];
+
+                        return `
+
+                            <div class="set-row">
+
+                                <div class="set-number">
+                                    ${setIndex + 1}
+                                </div>
+
+
+                                <div class="set-input">
+
+                                    <span>KG</span>
+
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.5"
+                                        value="${set.weight || ""}"
+                                        data-exercise="${exerciseIndex}"
+                                        data-set="${setIndex}"
+                                        data-field="weight"
+                                        placeholder="0"
+                                    >
+
+                                </div>
+
+
+                                <div class="set-input">
+
+                                    <span>REPS</span>
+
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value="${set.reps || ""}"
+                                        data-exercise="${exerciseIndex}"
+                                        data-set="${setIndex}"
+                                        data-field="reps"
+                                        placeholder="0"
+                                    >
+
+                                </div>
+
+
+                                <button
+                                    class="set-check ${set.done ? "done" : ""}"
+                                    onclick="toggleSet(${exerciseIndex}, ${setIndex}, this)"
+                                >
+                                    ${set.done ? "✓" : "○"}
+                                </button>
+
+                            </div>
+
+                        `;
+                    }
+                ).join("")}
+
+            </div>
+
+
+            <input
+                class="note-input"
+                type="text"
+                placeholder="ملاحظة عن التمرين..."
+                value="${escapeHTML(savedExercise.note || "")}"
+                data-exercise="${exerciseIndex}"
+                data-note="true"
+            >
+
+        `;
+
+
+        list.appendChild(card);
+
+    });
+
+
+    setupInputListeners();
 }
 
 
 /* =========================================================
-   SET DONE
+   DRAFT
 ========================================================= */
 
-function toggleSetDone(button) {
+function createDraft(day) {
 
-  button.classList.toggle("done");
+    return {
 
-  if (button.classList.contains("done")) {
+        exercises:
+            routines[day].map(exercise => {
 
-    startRestTimer();
+                return {
 
-  }
+                    name: exercise[0],
 
+                    sets:
+                        Array.from(
+                            { length: exercise[1] },
+                            () => ({
+                                weight: "",
+                                reps: "",
+                                done: false
+                            })
+                        ),
+
+                    note: ""
+
+                };
+
+            })
+
+    };
+}
+
+
+function getDraft(day) {
+
+    if (!data.drafts[day]) {
+
+        data.drafts[day] =
+            createDraft(day);
+
+        persistData();
+    }
+
+    return data.drafts[day];
+}
+
+
+/* =========================================================
+   INPUT HANDLERS
+========================================================= */
+
+function setupInputListeners() {
+
+    document
+        .querySelectorAll(
+            "#exerciseList input[data-exercise]"
+        )
+        .forEach(input => {
+
+            input.addEventListener(
+                "input",
+                handleExerciseInput
+            );
+
+        });
+}
+
+
+function handleExerciseInput(event) {
+
+    const input =
+        event.target;
+
+    const exerciseIndex =
+        Number(input.dataset.exercise);
+
+    const setIndex =
+        Number(input.dataset.set);
+
+    const field =
+        input.dataset.field;
+
+    const draft =
+        getDraft(currentDay);
+
+
+    if (input.dataset.note) {
+
+        draft.exercises[
+            exerciseIndex
+        ].note = input.value;
+
+    } else {
+
+        draft.exercises[
+            exerciseIndex
+        ].sets[
+            setIndex
+        ][field] = input.value;
+
+    }
+
+
+    clearTimeout(autoSaveTimeout);
+
+    document.getElementById("autosaveText")
+        .textContent = "جاري الحفظ...";
+
+
+    autoSaveTimeout =
+        setTimeout(() => {
+
+            saveWorkoutDraft(false);
+
+            document.getElementById("autosaveText")
+                .textContent = "تم الحفظ تلقائيًا ✓";
+
+        }, 600);
+}
+
+
+/* =========================================================
+   SET TOGGLE
+========================================================= */
+
+function toggleSet(
+    exerciseIndex,
+    setIndex,
+    button
+) {
+
+    const draft =
+        getDraft(currentDay);
+
+    const set =
+        draft.exercises[
+            exerciseIndex
+        ].sets[
+            setIndex
+        ];
+
+
+    if (
+        !set.weight ||
+        !set.reps
+    ) {
+
+        showToast(
+            "⚠️",
+            "اكتب الوزن والعدات الأول"
+        );
+
+        button.classList.add("shake");
+
+        setTimeout(
+            () => button.classList.remove("shake"),
+            400
+        );
+
+        return;
+    }
+
+
+    set.done =
+        !set.done;
+
+
+    if (set.done) {
+
+        button.classList.add("done");
+
+        button.textContent = "✓";
+
+        startRestTimer(
+            90
+        );
+
+        animateCompletedSet(button);
+
+    } else {
+
+        button.classList.remove("done");
+
+        button.textContent = "○";
+    }
+
+
+    saveWorkoutDraft(false);
+
+    renderWorkoutProgressOnly();
+}
+
+
+function renderWorkoutProgressOnly() {
+
+    const draft =
+        getDraft(currentDay);
+
+    const total =
+        routines[currentDay]
+            .reduce(
+                (sum, ex) => sum + ex[1],
+                0
+            );
+
+    let completed = 0;
+
+    draft.exercises.forEach(ex => {
+
+        ex.sets.forEach(set => {
+
+            if (
+                set.done &&
+                set.weight &&
+                set.reps
+            ) {
+                completed++;
+            }
+
+        });
+
+    });
+
+
+    const percent =
+        total
+            ? Math.round(
+                completed / total * 100
+            )
+            : 0;
+
+
+    document.getElementById(
+        "sessionPercent"
+    ).textContent = `${percent}%`;
+
+    document.getElementById(
+        "sessionSetsText"
+    ).textContent =
+        `${completed} / ${total} sets`;
+
+    document.getElementById(
+        "sessionProgressBar"
+    ).style.width =
+        `${percent}%`;
+}
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function saveWorkoutDraft(showMessage = false) {
+
+    const draft =
+        getDraft(currentDay);
+
+    data.drafts[currentDay] =
+        draft;
+
+    data.currentDay =
+        currentDay;
+
+    persistData();
+
+
+    if (showMessage) {
+
+        const page =
+            document.getElementById(
+                "workoutPage"
+            );
+
+        page.classList.add(
+            "flash-save"
+        );
+
+        setTimeout(
+            () => page.classList.remove("flash-save"),
+            700
+        );
+
+        showToast(
+            "💾",
+            "تم حفظ التمرين"
+        );
+
+    }
 }
 
 
@@ -563,278 +984,657 @@ function toggleSetDone(button) {
 
 function finishWorkout() {
 
-  const today =
-    new Date().toISOString().split("T")[0];
+    const draft =
+        getDraft(currentDay);
 
 
-  const previousDate =
-    data.lastWorkoutDate;
+    let completedSets = 0;
+
+    let totalSets = 0;
+
+    const sessionExercises = [];
 
 
-  let streakIncrease = false;
+    draft.exercises.forEach(
+        exercise => {
+
+            exercise.sets.forEach(
+                set => {
+
+                    totalSets++;
+
+                    if (
+                        set.weight &&
+                        set.reps &&
+                        set.done
+                    ) {
+
+                        completedSets++;
+
+                    }
+
+                }
+            );
 
 
-  if (previousDate !== today) {
+            sessionExercises.push({
 
-    if (previousDate) {
+                name: exercise.name,
 
-      const previous =
-        new Date(previousDate);
+                sets:
+                    exercise.sets
+                        .filter(
+                            set =>
+                                set.weight &&
+                                set.reps
+                        )
+                        .map(
+                            set => ({
+                                weight:
+                                    Number(
+                                        set.weight
+                                    ),
 
-      const current =
-        new Date(today);
+                                reps:
+                                    Number(
+                                        set.reps
+                                    )
+                            })
+                        )
 
-      const difference =
-        Math.round(
-          (current - previous) /
-          86400000
+            });
+
+        }
+    );
+
+
+    if (completedSets === 0) {
+
+        showToast(
+            "⚠️",
+            "اعمل Set واحدة على الأقل"
         );
 
-      if (difference === 1) {
+        return;
+    }
 
-        data.streak++;
 
-      } else {
+    const newPRs =
+        detectPRs(
+            sessionExercises
+        );
 
-        data.streak = 1;
 
-      }
+    const workout = {
+
+        id:
+            Date.now(),
+
+        date:
+            new Date().toISOString(),
+
+        day:
+            currentDay,
+
+        totalSets:
+            completedSets,
+
+        exercises:
+            sessionExercises,
+
+        prs:
+            newPRs
+
+    };
+
+
+    data.workouts.push(
+        workout
+    );
+
+
+    delete data.drafts[
+        currentDay
+    ];
+
+
+    persistData();
+
+
+    renderDashboard();
+
+    renderProgress();
+
+    renderHistory();
+
+    renderWorkout();
+
+
+    if (newPRs.length) {
+
+        showToast(
+            "🏆",
+            `PR جديد! ${newPRs.length}`
+        );
+
+        launchPRAnimation();
 
     } else {
 
-      data.streak = 1;
+        showToast(
+            "🔥",
+            "التمرين خلص يا وحش"
+        );
+    }
+
+
+    setTimeout(
+        () => showPage("dashboardPage"),
+        900
+    );
+}
+
+
+/* =========================================================
+   PR SYSTEM
+========================================================= */
+
+function detectPRs(
+    sessionExercises
+) {
+
+    const newPRs = [];
+
+
+    sessionExercises.forEach(
+        exercise => {
+
+            if (!exercise.sets.length) {
+                return;
+            }
+
+
+            const sessionMax =
+                Math.max(
+                    ...exercise.sets.map(
+                        set => set.weight
+                    )
+                );
+
+
+            const oldPR =
+                Number(
+                    data.prs[
+                        exercise.name
+                    ] || 0
+                );
+
+
+            if (sessionMax > oldPR) {
+
+                data.prs[
+                    exercise.name
+                ] = sessionMax;
+
+                data.prEvents =
+                    Number(
+                        data.prEvents || 0
+                    ) + 1;
+
+
+                newPRs.push({
+                    name:
+                        exercise.name,
+
+                    weight:
+                        sessionMax
+                });
+
+            }
+
+        }
+    );
+
+
+    return newPRs;
+}
+
+
+/* =========================================================
+   PREVIOUS PERFORMANCE
+========================================================= */
+
+function findPreviousPerformance(
+    exerciseName,
+    day
+) {
+
+    for (
+        let i =
+            data.workouts.length - 1;
+
+        i >= 0;
+
+        i--
+    ) {
+
+        const workout =
+            data.workouts[i];
+
+
+        const exercise =
+            workout.exercises?.find(
+                ex =>
+                    ex.name === exerciseName
+            );
+
+
+        if (
+            exercise &&
+            exercise.sets?.length
+        ) {
+
+            return exercise.sets
+                .map(
+                    set =>
+                        `${set.weight}kg × ${set.reps}`
+                )
+                .join(" / ");
+
+        }
 
     }
 
-    data.lastWorkoutDate = today;
 
-    streakIncrease = true;
-
-  }
-
-
-  data.totalWorkouts++;
-
-
-  const workoutRecord = {
-
-    id: Date.now(),
-
-    date: today,
-
-    routine: currentRoutine,
-
-    xp: 50
-
-  };
-
-
-  data.history.unshift(
-    workoutRecord
-  );
-
-
-  addXP(50);
-
-
-  saveData();
-
-
-  updateDashboard();
-
-  renderWorkoutHistory();
-
-
-  if (streakIncrease) {
-
-    showToast(
-      `🔥 Streak: ${data.streak} days`
-    );
-
-  } else {
-
-    showToast(
-      "Workout completed! +50 XP"
-    );
-
-  }
-
-
-  setTimeout(() => {
-
-    showPage("homePage");
-
-  }, 800);
-
+    return null;
 }
 
 
 /* =========================================================
-   XP SYSTEM
+   OVERLOAD SUGGESTION
 ========================================================= */
 
-function xpNeeded(level) {
+function getOverloadSuggestion(
+    name,
+    repRange,
+    previous
+) {
 
-  return 100 + ((level - 1) * 50);
-
-}
-
-
-function addXP(amount) {
-
-  const oldLevel =
-    data.level;
+    if (!previous) {
+        return "ابدأ بوزن يسمح لك بالحركة الصحيحة.";
+    }
 
 
-  data.xp += amount;
+    const numbers =
+        repRange.match(/\d+/g);
+
+    if (!numbers) {
+        return "";
+    }
 
 
-  while (
-    data.xp >= xpNeeded(data.level)
-  ) {
-
-    data.xp -= xpNeeded(data.level);
-
-    data.level++;
-
-  }
+    const maxReps =
+        Number(numbers[1] || numbers[0]);
 
 
-  saveData();
+    const previousSets =
+        previous.split(" / ");
 
-  updateDashboard();
+
+    const allHitTop =
+        previousSets.every(set => {
+
+            const match =
+                set.match(/×\s*(\d+)/);
+
+            return (
+                match &&
+                Number(match[1]) >= maxReps
+            );
+
+        });
 
 
-  if (data.level > oldLevel) {
+    if (allHitTop) {
 
-    showLevelUp(
-      data.level
-    );
+        return "⚡ وصلت للحد الأعلى — جرّب زيادة بسيطة في الوزن.";
 
-  }
+    }
 
+
+    return "استهدف زيادة عدة أو عدة عدات قبل زيادة الوزن.";
 }
 
 
 /* =========================================================
-   DASHBOARD
+   PROGRESS
 ========================================================= */
 
-function updateDashboard() {
+function renderProgress() {
 
-  const level =
-    document.getElementById("levelValue");
-
-  const homeLevel =
-    document.getElementById("homeLevel");
-
-  const xpText =
-    document.getElementById("xpText");
-
-  const xpProgress =
-    document.getElementById("xpProgress");
-
-  const streak =
-    document.getElementById("streakValue");
-
-  const workouts =
-    document.getElementById("workoutCount");
-
-  const totalXP =
-    document.getElementById("totalXP");
-
-  const weight =
-    document.getElementById("homeWeight");
-
-  const greeting =
-    document.getElementById("userGreeting");
+    const prEntries =
+        Object.entries(data.prs)
+            .sort(
+                (a,b) => b[1] - a[1]
+            );
 
 
-  if (level) level.textContent = data.level;
-
-  if (homeLevel) {
-    homeLevel.textContent = data.level;
-  }
-
-  if (streak) {
-    streak.textContent = data.streak;
-  }
-
-  if (workouts) {
-    workouts.textContent = data.totalWorkouts;
-  }
-
-  if (weight) {
-    weight.textContent = data.weight;
-  }
-
-  if (greeting) {
-    greeting.textContent = data.name;
-  }
+    document.getElementById(
+        "progressPRCount"
+    ).textContent =
+        prEntries.length;
 
 
-  const needed =
-    xpNeeded(data.level);
-
-  if (xpText) {
-
-    xpText.textContent =
-      `${data.xp} / ${needed}`;
-
-  }
+    const list =
+        document.getElementById(
+            "prList"
+        );
 
 
-  if (xpProgress) {
+    if (!prEntries.length) {
 
-    const percentage =
-      Math.min(
-        100,
-        (data.xp / needed) * 100
-      );
+        list.innerHTML = `
+            <div class="previous-performance">
+                لسه مفيش PRs — أول تمرين هيبدأ السجل 💪
+            </div>
+        `;
 
-    xpProgress.style.width =
-      `${percentage}%`;
+    } else {
 
-  }
-
-
-  if (totalXP) {
-
-    const total =
-      data.history.reduce(
-        (sum, item) =>
-          sum + Number(item.xp || 0),
-        0
-      );
-
-    totalXP.textContent = total;
-
-  }
+        const max =
+            Math.max(
+                ...prEntries.map(
+                    item => item[1]
+                )
+            );
 
 
-  const routine =
-    document.getElementById("todayRoutine");
+        list.innerHTML =
+            prEntries
+                .map(
+                    ([name, weight]) => {
 
-  const exercises =
-    document.getElementById("todayExercises");
+                        const percentage =
+                            Math.max(
+                                5,
+                                Math.round(
+                                    weight / max * 100
+                                )
+                            );
 
-  if (routine) {
+                        return `
 
-    routine.textContent =
-      currentRoutine;
+                            <div class="pr-item">
 
-  }
+                                <strong>
+                                    ${name}
+                                </strong>
 
-  if (exercises) {
+                                <div class="bar">
+                                    <div
+                                        style="width:${percentage}%"
+                                    ></div>
+                                </div>
 
-    exercises.textContent =
-      `${routines[currentRoutine].length} exercises`;
+                                <div class="pr-weight">
+                                    ${weight}kg
+                                </div>
 
-  }
+                            </div>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
 
 
-  updateWeightProgress();
+    renderWeights();
+}
 
+
+/* =========================================================
+   BODY WEIGHT
+========================================================= */
+
+function openWeightModal() {
+
+    const latest =
+        getLatestWeight();
+
+    document.getElementById(
+        "bodyWeightInput"
+    ).value =
+        latest || "";
+
+
+    document.getElementById(
+        "weightModal"
+    ).classList.add("show");
+}
+
+
+function closeWeightModal() {
+
+    document.getElementById(
+        "weightModal"
+    ).classList.remove("show");
+}
+
+
+function saveWeight() {
+
+    const input =
+        document.getElementById(
+            "bodyWeightInput"
+        );
+
+    const weight =
+        Number(input.value);
+
+
+    if (
+        !weight ||
+        weight < 20 ||
+        weight > 300
+    ) {
+
+        showToast(
+            "⚠️",
+            "اكتب وزن صحيح"
+        );
+
+        return;
+    }
+
+
+    data.weights.push({
+
+        date:
+            new Date().toISOString(),
+
+        weight
+
+    });
+
+
+    persistData();
+
+    closeWeightModal();
+
+    renderDashboard();
+
+    renderProgress();
+
+    showToast(
+        "⚖️",
+        `تم تسجيل ${weight} KG`
+    );
+}
+
+
+function getLatestWeight() {
+
+    if (!data.weights.length) {
+        return null;
+    }
+
+    return data.weights[
+        data.weights.length - 1
+    ].weight;
+}
+
+
+function renderWeights() {
+
+    const latest =
+        getLatestWeight();
+
+
+    document.getElementById(
+        "currentBodyWeight"
+    ).textContent =
+        latest || "--";
+
+
+    const history =
+        document.getElementById(
+            "weightHistory"
+        );
+
+
+    if (!data.weights.length) {
+
+        history.innerHTML = `
+            <div class="previous-performance">
+                سجل وزنك عشان نتابع التطور.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    history.innerHTML =
+        data.weights
+            .slice(-8)
+            .reverse()
+            .map(item => {
+
+                const date =
+                    new Date(
+                        item.date
+                    ).toLocaleDateString(
+                        "ar-EG",
+                        {
+                            day: "numeric",
+                            month: "short"
+                        }
+                    );
+
+                return `
+                    <div class="weight-item">
+                        <strong>
+                            ${item.weight}
+                        </strong>
+                        <span>
+                            ${date}
+                        </span>
+                    </div>
+                `;
+
+            })
+            .join("");
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function renderHistory() {
+
+    const list =
+        document.getElementById(
+            "historyList"
+        );
+
+
+    if (!data.workouts.length) {
+
+        list.innerHTML = `
+            <div class="section-card">
+                <div class="previous-performance">
+                    مفيش تمارين مسجلة لسه.
+                    أول تمرين هتعمله هيظهر هنا 🔥
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+
+    list.innerHTML =
+        [...data.workouts]
+            .reverse()
+            .map(workout => {
+
+                const date =
+                    new Date(
+                        workout.date
+                    ).toLocaleDateString(
+                        "ar-EG",
+                        {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                        }
+                    );
+
+
+                const prs =
+                    workout.prs?.length || 0;
+
+
+                return `
+
+                    <article class="history-item">
+
+                        <div>
+
+                            <h3>
+                                ${workout.day}
+                            </h3>
+
+                            <span>
+                                ${date}
+                            </span>
+
+                        </div>
+
+
+                        <div class="history-right">
+
+                            <strong>
+                                ${workout.totalSets}
+                            </strong>
+
+                            <span>
+                                sets
+                                ${prs ? ` · 🏆 ${prs}` : ""}
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            })
+            .join("");
 }
 
 
@@ -842,1077 +1642,121 @@ function updateDashboard() {
    REST TIMER
 ========================================================= */
 
-function getRestDuration() {
-
-  const saved =
-    Number(data.restTimer);
-
-  if (
-    [30,60,90,120].includes(saved)
-  ) {
-
-    return saved;
-
-  }
-
-  return 90;
-
-}
-
-
-function formatTime(seconds) {
-
-  const minutes =
-    Math.floor(seconds / 60)
-      .toString()
-      .padStart(2,"0");
-
-  const secondsPart =
-    (seconds % 60)
-      .toString()
-      .padStart(2,"0");
-
-  return `${minutes}:${secondsPart}`;
-
-}
-
-
-function updateTimerDisplay() {
-
-  const formatted =
-    formatTime(timerRemaining);
-
-
-  const small =
-    document.getElementById("timerDisplay");
-
-  const large =
-    document.getElementById("timerDisplayLarge");
-
-
-  if (small) {
-    small.textContent = formatted;
-  }
-
-  if (large) {
-    large.textContent = formatted;
-  }
-
-}
-
-
-function initTimer() {
-
-  timerSeconds =
-    getRestDuration();
-
-  timerRemaining =
-    timerSeconds;
-
-  updateTimerDisplay();
-
-  updateRestButtons();
-
-}
-
-
-function startRestTimer() {
-
-  stopTimer();
-
-  timerSeconds =
-    getRestDuration();
-
-  timerRemaining =
-    timerSeconds;
-
-  openTimer();
-
-  timerRunning = true;
-
-  updateTimerButton();
-
-
-  timerInterval =
-    setInterval(() => {
-
-      if (timerRemaining > 0) {
-
-        timerRemaining--;
-
-        updateTimerDisplay();
-
-      } else {
-
-        finishRestTimer();
-
-      }
-
-    },1000);
-
-}
-
-
-function toggleTimer() {
-
-  const card =
-    document.getElementById("timerCard");
-
-
-  if (!card) return;
-
-
-  if (
-    card.classList.contains("hidden")
-  ) {
-
-    startRestTimer();
-
-    return;
-
-  }
-
-
-  if (timerRunning) {
-
-    pauseTimer();
-
-  } else {
-
-    resumeTimer();
-
-  }
-
-}
-
-
-function openTimer() {
-
-  const card =
-    document.getElementById("timerCard");
-
-  if (!card) return;
-
-  card.classList.remove("hidden");
-
-  updateTimerDisplay();
-
-  updateTimerButton();
-
-}
-
-
-function closeTimer() {
-
-  stopTimer();
-
-  const card =
-    document.getElementById("timerCard");
-
-  if (card) {
-
-    card.classList.add("hidden");
-
-  }
-
-}
-
-
-function pauseTimer() {
-
-  timerRunning = false;
-
-  if (timerInterval) {
+function startRestTimer(seconds = 90) {
 
     clearInterval(timerInterval);
 
-    timerInterval = null;
 
-  }
+    timerTotal =
+        Number(seconds);
 
-  updateTimerButton();
+    timerRemaining =
+        Number(seconds);
 
+
+    updateTimerUI();
+
+
+    document
+        .getElementById("timerCard")
+        .classList.add("show");
+
+
+    timerInterval =
+        setInterval(
+            () => {
+
+                timerRemaining--;
+
+                updateTimerUI();
+
+
+                if (
+                    timerRemaining <= 0
+                ) {
+
+                    clearInterval(
+                        timerInterval
+                    );
+
+                    timerRemaining = 0;
+
+                    updateTimerUI();
+
+                    timerFinished();
+
+                }
+
+            },
+            1000
+        );
 }
 
 
-function resumeTimer() {
+function updateTimerUI() {
 
-  if (timerRemaining <= 0) {
+    const minutes =
+        Math.floor(
+            timerRemaining / 60
+        );
 
-    startRestTimer();
+    const seconds =
+        timerRemaining % 60;
 
-    return;
 
-  }
-
-
-  timerRunning = true;
-
-
-  if (timerInterval) {
-
-    clearInterval(timerInterval);
-
-  }
-
-
-  timerInterval =
-    setInterval(() => {
-
-      if (timerRemaining > 0) {
-
-        timerRemaining--;
-
-        updateTimerDisplay();
-
-      } else {
-
-        finishRestTimer();
-
-      }
-
-    },1000);
-
-
-  updateTimerButton();
-
-}
-
-
-function stopTimer() {
-
-  timerRunning = false;
-
-
-  if (timerInterval) {
-
-    clearInterval(timerInterval);
-
-    timerInterval = null;
-
-  }
-
-
-  updateTimerButton();
-
-}
-
-
-function resetTimer() {
-
-  stopTimer();
-
-  timerSeconds =
-    getRestDuration();
-
-  timerRemaining =
-    timerSeconds;
-
-  updateTimerDisplay();
-
-}
-
-
-function finishRestTimer() {
-
-  stopTimer();
-
-  timerRemaining = 0;
-
-  updateTimerDisplay();
-
-  showToast(
-    "🔥 Rest finished — next set!"
-  );
-
-}
-
-
-function updateTimerButton() {
-
-  const button =
-    document.getElementById("timerToggleBtn");
-
-  if (!button) return;
-
-
-  button.textContent =
-    timerRunning
-      ? "Pause"
-      : "Start";
-
-}
-
-
-/* =========================================================
-   REST TIMER SETTINGS
-========================================================= */
-
-function setRest(seconds) {
-
-  seconds =
-    Number(seconds);
-
-
-  if (
-    ![30,60,90,120].includes(seconds)
-  ) {
-
-    seconds = 90;
-
-  }
-
-
-  data.restTimer =
-    seconds;
-
-
-  timerSeconds =
-    seconds;
-
-  timerRemaining =
-    seconds;
-
-
-  stopTimer();
-
-
-  saveData();
-
-
-  updateTimerDisplay();
-
-  updateRestButtons();
-
-
-  const current =
     document.getElementById(
-      "currentRestText"
-    );
+        "timerDisplay"
+    ).textContent =
+        `${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
 
 
-  if (current) {
+    const percentage =
+        timerTotal
+            ? timerRemaining /
+              timerTotal * 100
+            : 0;
 
-    current.textContent =
-      `${seconds} sec`;
 
-  }
-
-
-  showToast(
-    `Rest timer: ${seconds} seconds`
-  );
-
+    document.getElementById(
+        "timerBar"
+    ).style.width =
+        `${percentage}%`;
 }
 
 
-function updateRestButtons() {
-
-  const selected =
-    getRestDuration();
-
-
-  document
-    .querySelectorAll("[data-rest]")
-    .forEach(button => {
-
-      button.classList.toggle(
-        "active",
-        Number(button.dataset.rest) === selected
-      );
-
-    });
-
-
-  const current =
-    document.getElementById(
-      "currentRestText"
-    );
-
-
-  if (current) {
-
-    current.textContent =
-      `${selected} sec`;
-
-  }
-
-}
-
-
-/* =========================================================
-   WEIGHT
-========================================================= */
-
-function saveWeight() {
-
-  const input =
-    document.getElementById(
-      "weightInput"
-    );
-
-
-  const weight =
-    Number(input.value);
-
-
-  if (
-    !weight ||
-    weight < 30 ||
-    weight > 300
-  ) {
+function timerFinished() {
 
     showToast(
-      "Enter a valid weight"
+        "⏱️",
+        "خلصت الراحة — يلا Set جديدة!"
     );
 
-    return;
 
-  }
+    const card =
+        document.getElementById(
+            "timerCard"
+        );
 
+    card.classList.add(
+        "pr-pop"
+    );
 
-  data.weight =
-    weight;
-
-
-  data.weightHistory.unshift({
-
-    date:
-      new Date()
-        .toISOString()
-        .split("T")[0],
-
-    weight
-
-  });
-
-
-  saveData();
-
-
-  updateDashboard();
-
-  renderWeightHistory();
-
-  updateWeightProgress();
-
-
-  input.value = "";
-
-
-  addXP(10);
-
-
-  showToast(
-    "Weight updated +10 XP"
-  );
-
+    setTimeout(
+        () => card.classList.remove("pr-pop"),
+        700
+    );
 }
 
 
-function updateWeightProgress() {
+function closeRestTimer() {
 
-  const current =
-    Number(data.weight);
-
-  const goal =
-    Number(data.goalWeight);
-
-
-  const progress =
-    Math.max(
-      0,
-      Math.min(
-        100,
-        (current / goal) * 100
-      )
+    clearInterval(
+        timerInterval
     );
 
-
-  const bar =
-    document.getElementById(
-      "weightProgress"
-    );
-
-  const value =
-    document.getElementById(
-      "evolutionWeight"
-    );
-
-
-  const goalText =
-    document.getElementById(
-      "goalWeightText"
-    );
-
-
-  if (bar) {
-
-    bar.style.width =
-      `${progress}%`;
-
-  }
-
-  if (value) {
-
-    value.textContent =
-      current;
-
-  }
-
-  if (goalText) {
-
-    goalText.textContent =
-      goal;
-
-  }
-
-}
-
-
-function renderWeightHistory() {
-
-  const container =
-    document.getElementById(
-      "weightHistory"
-    );
-
-
-  if (!container) return;
-
-
-  if (
-    !data.weightHistory.length
-  ) {
-
-    container.innerHTML = `
-
-      <div class="history-item">
-
-        <div>
-
-          <strong>
-            No weight records yet
-          </strong>
-
-          <small>
-            Start tracking your progress.
-          </small>
-
-        </div>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    data.weightHistory
-      .slice(0,20)
-      .map(item => `
-
-        <div class="history-item">
-
-          <div>
-
-            <strong>
-              ${item.weight} kg
-            </strong>
-
-            <small>
-              ${item.date}
-            </small>
-
-          </div>
-
-          <span class="history-xp">
-            ⚖
-          </span>
-
-        </div>
-
-      `)
-      .join("");
-
-}
-
-
-/* =========================================================
-   BODY PHOTOS
-========================================================= */
-
-function saveBodyPhoto(event) {
-
-  const file =
-    event.target.files[0];
-
-  if (!file) return;
-
-
-  const reader =
-    new FileReader();
-
-
-  reader.onload =
-    function(e) {
-
-      data.photos.unshift(
-        e.target.result
-      );
-
-
-      data.photos =
-        data.photos.slice(0,30);
-
-
-      saveData();
-
-      renderPhotos();
-
-
-      addXP(10);
-
-
-      showToast(
-        "Progress photo saved +10 XP"
-      );
-
-    };
-
-
-  reader.readAsDataURL(file);
-
-}
-
-
-function renderPhotos() {
-
-  const grid =
-    document.getElementById(
-      "photoGrid"
-    );
-
-
-  if (!grid) return;
-
-
-  grid.innerHTML =
-    data.photos
-      .map(photo => `
-
-        <img
-          src="${photo}"
-          alt="Progress photo">
-
-      `)
-      .join("");
-
-}
-
-
-/* =========================================================
-   WORKOUT HISTORY
-========================================================= */
-
-function renderWorkoutHistory() {
-
-  const container =
-    document.getElementById(
-      "workoutHistory"
-    );
-
-
-  if (!container) return;
-
-
-  if (!data.history.length) {
-
-    container.innerHTML = `
-
-      <div class="history-item">
-
-        <div>
-
-          <strong>
-            No workouts yet
-          </strong>
-
-          <small>
-            Complete your first workout.
-          </small>
-
-        </div>
-
-      </div>
-
-    `;
-
-    return;
-
-  }
-
-
-  container.innerHTML =
-    data.history
-      .slice(0,30)
-      .map(item => `
-
-        <div class="history-item">
-
-          <div>
-
-            <strong>
-              ${item.routine}
-            </strong>
-
-            <small>
-              ${item.date}
-            </small>
-
-          </div>
-
-          <span class="history-xp">
-            +${item.xp} XP
-          </span>
-
-        </div>
-
-      `)
-      .join("");
-
-}
-
-
-/* =========================================================
-   CALORIES
-========================================================= */
-
-function calculateCalories() {
-
-  const weight =
-    Number(
-      document.getElementById(
-        "calWeight"
-      )?.value
-    );
-
-  const height =
-    Number(
-      document.getElementById(
-        "calHeight"
-      )?.value
-    );
-
-  const age =
-    Number(
-      document.getElementById(
-        "calAge"
-      )?.value
-    );
-
-  const activity =
-    Number(
-      document.getElementById(
-        "activityLevel"
-      )?.value
-    );
-
-
-  if (
-    !weight ||
-    !height ||
-    !age ||
-    !activity
-  ) {
-
-    return;
-
-  }
-
-
-  /*
-    Mifflin-St Jeor
-    Male
-  */
-
-  const bmr =
-    (10 * weight)
-    +
-    (6.25 * height)
-    -
-    (5 * age)
-    +
-    5;
-
-
-  const tdee =
-    bmr * activity;
-
-
-  const bulk =
-    tdee + 250;
-
-
-  const result =
-    document.getElementById(
-      "calorieResult"
-    );
-
-
-  if (result) {
-
-    result.classList.remove(
-      "hidden"
-    );
-
-  }
-
-
-  document.getElementById(
-    "bmrValue"
-  ).textContent =
-    Math.round(bmr);
-
-
-  document.getElementById(
-    "tdeeValue"
-  ).textContent =
-    Math.round(tdee);
-
-
-  document.getElementById(
-    "bulkValue"
-  ).textContent =
-    Math.round(bulk);
-
-}
-
-
-/* =========================================================
-   NAME
-========================================================= */
-
-function saveName() {
-
-  const input =
-    document.getElementById(
-      "nameInput"
-    );
-
-
-  const name =
-    input.value.trim();
-
-
-  if (!name) {
-
-    showToast(
-      "Enter your name"
-    );
-
-    return;
-
-  }
-
-
-  data.name =
-    name;
-
-
-  saveData();
-
-  updateDashboard();
-
-
-  showToast(
-    "Name saved"
-  );
-
-}
-
-
-/* =========================================================
-   THEME
-========================================================= */
-
-function applyTheme() {
-
-  document.body.classList.toggle(
-    "light",
-    data.theme === "light"
-  );
-
-
-  const button =
-    document.getElementById(
-      "themeBtn"
-    );
-
-
-  if (button) {
-
-    button.textContent =
-      data.theme === "light"
-        ? "☀"
-        : "☾";
-
-  }
-
-}
-
-
-function setTheme(theme) {
-
-  data.theme =
-    theme;
-
-
-  saveData();
-
-  applyTheme();
-
-}
-
-
-/* =========================================================
-   QUICK THEME TOGGLE
-========================================================= */
-
-function toggleTheme() {
-
-  data.theme =
-    data.theme === "dark"
-      ? "light"
-      : "dark";
-
-
-  saveData();
-
-  applyTheme();
-
-}
-
-
-/* =========================================================
-   LANGUAGE
-========================================================= */
-
-const translations = {
-
-  en: {
-
-    welcome: "WELCOME BACK",
-
-    keepGoing: "Keep building.",
-
-    streak: "Streak",
-
-    workouts: "Workouts",
-
-    today: "Today"
-
-  },
-
-  ar: {
-
-    welcome: "أهلاً بعودتك",
-
-    keepGoing: "كمل طريقك.",
-
-    streak: "الاستمرارية",
-
-    workouts: "التمارين",
-
-    today: "اليوم"
-
-  }
-
-};
-
-
-function setLanguage(language) {
-
-  if (
-    !translations[language]
-  ) return;
-
-
-  data.language =
-    language;
-
-
-  saveData();
-
-  applyLanguage();
-
-}
-
-
-function applyLanguage() {
-
-  const language =
-    data.language || "en";
-
-
-  document.documentElement.lang =
-    language;
-
-
-  document
-    .querySelectorAll("[data-i18n]")
-    .forEach(element => {
-
-      const key =
-        element.dataset.i18n;
-
-
-      if (
-        translations[language] &&
-        translations[language][key]
-      ) {
-
-        element.textContent =
-          translations[language][key];
-
-      }
-
-    });
-
-
-  const ar =
-    document.getElementById(
-      "langAr"
-    );
-
-  const en =
-    document.getElementById(
-      "langEn"
-    );
-
-
-  if (ar) {
-
-    ar.classList.toggle(
-      "active",
-      language === "ar"
-    );
-
-  }
-
-
-  if (en) {
-
-    en.classList.toggle(
-      "active",
-      language === "en"
-    );
-
-  }
-
+    document
+        .getElementById("timerCard")
+        .classList.remove("show");
 }
 
 
@@ -1920,167 +1764,474 @@ function applyLanguage() {
    TOAST
 ========================================================= */
 
-let toastTimeout = null;
+let toastTimeout;
 
 
-function showToast(message) {
+function showToast(
+    icon,
+    message
+) {
 
-  const toast =
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
     document.getElementById(
-      "toast"
-    );
+        "toastIcon"
+    ).textContent =
+        icon;
 
 
-  if (!toast) return;
+    document.getElementById(
+        "toastMessage"
+    ).textContent =
+        message;
 
 
-  toast.textContent =
-    message;
-
-
-  toast.classList.add(
-    "show"
-  );
-
-
-  clearTimeout(
-    toastTimeout
-  );
-
-
-  toastTimeout =
-    setTimeout(() => {
-
-      toast.classList.remove(
+    toast.classList.add(
         "show"
-      );
+    );
 
-    },2500);
 
+    clearTimeout(
+        toastTimeout
+    );
+
+
+    toastTimeout =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2200
+        );
 }
 
 
 /* =========================================================
-   LEVEL UP
+   ANIMATIONS
 ========================================================= */
 
-function showLevelUp(level) {
+function animateCompletedSet(
+    element
+) {
 
-  const overlay =
-    document.getElementById(
-      "levelUp"
+    element.animate(
+        [
+            {
+                transform:
+                    "scale(1)"
+            },
+            {
+                transform:
+                    "scale(1.25)"
+            },
+            {
+                transform:
+                    "scale(1)"
+            }
+        ],
+        {
+            duration: 350,
+            easing: "ease-out"
+        }
     );
-
-
-  const number =
-    document.getElementById(
-      "levelUpNumber"
-    );
-
-
-  if (!overlay) return;
-
-
-  if (number) {
-
-    number.textContent =
-      level;
-
-  }
-
-
-  overlay.classList.remove(
-    "hidden"
-  );
-
 }
 
 
-function hideLevelUp() {
+function launchPRAnimation() {
 
-  const overlay =
-    document.getElementById(
-      "levelUp"
-    );
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
+        const particle =
+            document.createElement(
+                "div"
+            );
 
 
-  if (overlay) {
+        particle.textContent =
+            ["🏆","⚡","🔥","💪"][
+                Math.floor(
+                    Math.random() * 4
+                )
+            ];
 
-    overlay.classList.add(
-      "hidden"
-    );
 
-  }
+        particle.style.position =
+            "fixed";
 
+        particle.style.left =
+            `${Math.random() * 100}%`;
+
+        particle.style.top =
+            "45%";
+
+        particle.style.zIndex =
+            "500";
+
+        particle.style.fontSize =
+            `${14 + Math.random() * 16}px`;
+
+        particle.style.pointerEvents =
+            "none";
+
+
+        document.body.appendChild(
+            particle
+        );
+
+
+        particle.animate(
+            [
+                {
+                    transform:
+                        "translate(0,0) scale(1)",
+                    opacity: 1
+                },
+                {
+                    transform:
+                        `translate(
+                            ${(Math.random() - .5) * 180}px,
+                            ${-100 - Math.random() * 220}px
+                        ) scale(.3)`,
+                    opacity: 0
+                }
+            ],
+            {
+                duration:
+                    900 + Math.random() * 600,
+                easing:
+                    "cubic-bezier(.2,.8,.2,1)"
+            }
+        );
+
+
+        setTimeout(
+            () => particle.remove(),
+            1600
+        );
+    }
 }
 
 
 /* =========================================================
-   RESET APP
+   STREAK
 ========================================================= */
 
-function resetApp() {
+function calculateStreak() {
 
-  const confirmed =
-    confirm(
-      "Reset all MO GYM PRO data?"
-    );
-
-
-  if (!confirmed) return;
-
-
-  localStorage.removeItem(
-    STORAGE_KEY
-  );
-
-
-  localStorage.removeItem(
-    "moGymRestTimer"
-  );
-
-
-  data = {
-    ...defaultData
-  };
-
-
-  currentRoutine =
-    "Torso A";
-
-
-  timerSeconds =
-    90;
-
-  timerRemaining =
-    90;
-
-
-  saveData();
-
-
-  location.reload();
-
-}
-
-
-/* =========================================================
-   SAFETY
-========================================================= */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    if (timerInterval) {
-
-      clearInterval(
-        timerInterval
-      );
-
-      timerInterval = null;
-
+    if (!data.workouts.length) {
+        return 0;
     }
 
-  }
+
+    const dates =
+        data.workouts
+            .map(
+                workout =>
+                    new Date(
+                        workout.date
+                    ).toDateString()
+            );
+
+
+    const uniqueDates =
+        [...new Set(dates)]
+            .reverse();
+
+
+    let streak = 0;
+
+    let current =
+        new Date();
+
+
+    for (
+        let i = 0;
+        i < uniqueDates.length;
+        i++
+    ) {
+
+        const expected =
+            new Date(
+                current
+            ).toDateString();
+
+
+        if (
+            uniqueDates[i] === expected
+        ) {
+
+            streak++;
+
+            current.setDate(
+                current.getDate() - 1
+            );
+
+        } else if (
+            i === 0
+        ) {
+
+            current.setDate(
+                current.getDate() - 1
+            );
+
+            if (
+                uniqueDates[i] ===
+                current.toDateString()
+            ) {
+
+                streak++;
+
+                current.setDate(
+                    current.getDate() - 1
+                );
+
+            } else {
+
+                break;
+
+            }
+
+        } else {
+
+            break;
+
+        }
+    }
+
+
+    return streak;
+}
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+function exportData() {
+
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    data,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href = url;
+
+    link.download =
+        `MO-GYM-backup-${new Date()
+            .toISOString()
+            .slice(0,10)}.json`;
+
+
+    link.click();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+
+    showToast(
+        "📤",
+        "تم تصدير البيانات"
+    );
+}
+
+
+/* =========================================================
+   IMPORT
+========================================================= */
+
+function importData(event) {
+
+    const file =
+        event.target.files?.[0];
+
+
+    if (!file) return;
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(e) {
+
+            try {
+
+                const imported =
+                    JSON.parse(
+                        e.target.result
+                    );
+
+
+                data = {
+                    ...defaultData(),
+                    ...imported
+                };
+
+
+                persistData();
+
+
+                currentDay =
+                    data.currentDay ||
+                    "Torso A";
+
+
+                renderDashboard();
+
+                renderWorkout();
+
+                renderProgress();
+
+                renderHistory();
+
+
+                showToast(
+                    "📥",
+                    "تم استرجاع البيانات"
+                );
+
+
+            } catch {
+
+                showToast(
+                    "❌",
+                    "الملف غير صالح"
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(file);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetData() {
+
+    const confirmed =
+        confirm(
+            "متأكد إنك عايز تمسح كل بيانات MO GYM؟"
+        );
+
+
+    if (!confirmed) return;
+
+
+    localStorage.removeItem(
+        STORAGE_KEY
+    );
+
+
+    data =
+        defaultData();
+
+
+    currentDay =
+        "Torso A";
+
+
+    renderDashboard();
+
+    renderWorkout();
+
+    renderProgress();
+
+    renderHistory();
+
+
+    showToast(
+        "🗑️",
+        "تم مسح البيانات"
+    );
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            closeRestTimer();
+
+            closeWeightModal();
+
+        }
+
+        if (
+            event.code === "Space" &&
+            document.activeElement.tagName !== "INPUT"
+        ) {
+
+            event.preventDefault();
+
+            startRestTimer(90);
+
+        }
+
+    }
 );
