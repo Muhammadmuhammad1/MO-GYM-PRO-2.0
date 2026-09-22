@@ -1,497 +1,1097 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#050705">
-    <title>MO GYM PRO</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#050505">
+
+  <title>MO GYM PRO 2.0</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div id="app">
 
-    <!-- ================= TOP BAR ================= -->
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-icon">M</div>
-            <div>
-                <h1>MO GYM</h1>
-                <span>PRO TRAINING SYSTEM</span>
-            </div>
-        </div>
+  <!-- ================= TOP BAR ================= -->
 
-        <button class="icon-btn" onclick="showPage('settingsPage')" aria-label="الإعدادات">
-            ⚙️
-        </button>
-    </header>
+  <header class="topbar">
+
+    <div class="brand">
+      <strong>MO GYM</strong>
+      <span>PRO 2.0</span>
+    </div>
+
+    <button
+      class="icon-btn"
+      onclick="showPage('settingsPage')"
+      aria-label="Settings"
+    >
+      ⚙
+    </button>
+
+  </header>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main>
 
 
     <!-- ================= DASHBOARD ================= -->
-    <main id="dashboardPage" class="page active">
 
-        <section class="hero-card">
-            <div class="hero-glow"></div>
+    <section id="dashboardPage" class="page active">
 
-            <div class="hero-content">
-                <span class="eyebrow">WELCOME BACK</span>
+      <div class="character-card">
 
-                <h2>
-                    جاهز للتمرين؟
-                    <span>🔥</span>
-                </h2>
+        <div
+          id="characterBackground"
+          class="character-background"
+        ></div>
 
-                <p>
-                    كل مجموعة بتعملها النهارده بتقربك من النسخة اللي عايز توصلها.
-                </p>
+        <div class="character-overlay"></div>
 
-                <button class="primary-btn" onclick="startNextWorkout()">
-                    ابدأ التمرين
-                    <span>←</span>
-                </button>
-            </div>
+        <div class="character-content">
 
-            <div class="hero-badge">
-                <strong id="heroStreak">0</strong>
-                <span>DAY STREAK</span>
-                <div>🔥</div>
-            </div>
-        </section>
+          <div class="rank-badge" id="rankBadge">
+            NOVICE
+          </div>
 
+          <span class="eyebrow">
+            CURRENT LEVEL
+          </span>
 
-        <!-- STATS -->
-        <section class="stats-grid">
+          <h1 id="levelTitle">
+            LEVEL 1
+          </h1>
 
-            <div class="stat-card">
-                <div class="stat-icon">🏋️</div>
-                <strong id="statWorkouts">0</strong>
-                <span>تمرين</span>
-            </div>
+          <div class="xp-info">
 
-            <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <strong id="statPR">0</strong>
-                <span>PR</span>
-            </div>
+            <span id="xpCurrent">
+              0 XP
+            </span>
 
-            <div class="stat-card">
-                <div class="stat-icon">⚡</div>
-                <strong id="statSets">0</strong>
-                <span>Set</span>
-            </div>
+            <span id="xpNext">
+              500 XP
+            </span>
 
-            <div class="stat-card">
-                <div class="stat-icon">⚖️</div>
-                <strong id="statWeight">--</strong>
-                <span>KG</span>
-            </div>
+          </div>
 
-        </section>
+          <div class="xp-bar">
+            <span id="xpBar"></span>
+          </div>
 
+          <p id="levelMessage">
+            ابدأ أول تمرين لرفع مستواك.
+          </p>
 
-        <!-- NEXT WORKOUT -->
-        <section class="section-card next-workout">
+          <button
+            class="primary-btn glow-btn"
+            onclick="showPage('workoutPage')"
+          >
+            ⚔
+            <span data-i18n="startWorkout">
+              ابدأ التمرين
+            </span>
+          </button>
 
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">NEXT SESSION</span>
-                    <h3 id="nextWorkoutName">Torso A</h3>
-                </div>
+        </div>
 
-                <span class="day-pill" id="nextWorkoutType">
-                    TORSO
-                </span>
-            </div>
-
-            <div class="workout-preview">
-
-                <div class="preview-exercises" id="previewExercises">
-                    <!-- JS -->
-                </div>
-
-                <button class="secondary-btn" onclick="startNextWorkout()">
-                    دخول التمرين
-                    <span>→</span>
-                </button>
-
-            </div>
-
-        </section>
+      </div>
 
 
-        <!-- CHALLENGE -->
-        <section class="section-card challenge-card">
+      <!-- STATS -->
 
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">30 DAY CHALLENGE</span>
-                    <h3>استمرارية</h3>
-                </div>
+      <div class="stats-grid">
 
-                <strong id="challengePercent">0%</strong>
-            </div>
+        <div class="stat-card">
+          <span>🔥</span>
+          <small data-i18n="streak">
+            Streak
+          </small>
+          <strong id="statStreak">
+            0
+          </strong>
+        </div>
 
-            <div class="progress-track large">
-                <div id="challengeBar" class="progress-fill"></div>
-            </div>
+        <div class="stat-card">
+          <span>🏆</span>
+          <small>
+            PR
+          </small>
+          <strong id="statPR">
+            0
+          </strong>
+        </div>
 
-            <div class="challenge-footer">
-                <span id="challengeText">0 / 30 تمرين</span>
-                <span>NO ZERO DAYS</span>
-            </div>
+        <div class="stat-card">
+          <span>⚡</span>
+          <small>
+            XP
+          </small>
+          <strong id="statXP">
+            0
+          </strong>
+        </div>
 
-        </section>
+        <div class="stat-card">
+          <span>⚖️</span>
+          <small data-i18n="weight">
+            Weight
+          </small>
+          <strong id="statWeight">
+            —
+          </strong>
+        </div>
+
+      </div>
 
 
-        <!-- QUICK ACTIONS -->
-        <section class="section-card">
+      <!-- DAILY QUEST -->
 
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">QUICK ACTIONS</span>
-                    <h3>اختصارات</h3>
-                </div>
-            </div>
+      <div class="section-title">
 
-            <div class="quick-grid">
+        <h2 data-i18n="dailyQuest">
+          Daily Quest
+        </h2>
 
-                <button class="quick-btn" onclick="showPage('workoutPage')">
-                    <span>🏋️</span>
-                    <strong>التمرين</strong>
-                </button>
+        <span id="questCounter">
+          0 / 1
+        </span>
 
-                <button class="quick-btn" onclick="showPage('progressPage')">
-                    <span>📈</span>
-                    <strong>التقدم</strong>
-                </button>
+      </div>
 
-                <button class="quick-btn" onclick="showPage('historyPage')">
-                    <span>📅</span>
-                    <strong>السجل</strong>
-                </button>
+      <div class="quest-card">
 
-                <button class="quick-btn" onclick="openWeightModal()">
-                    <span>⚖️</span>
-                    <strong>الوزن</strong>
-                </button>
+        <div>
 
-            </div>
+          <strong id="questTitle">
+            Complete today's workout
+          </strong>
 
-        </section>
+          <p id="questDescription">
+            Finish one workout to earn bonus XP.
+          </p>
 
-    </main>
+        </div>
+
+        <button
+          class="round-btn"
+          onclick="showPage('workoutPage')"
+        >
+          →
+        </button>
+
+      </div>
+
+
+      <!-- NEXT WORKOUT -->
+
+      <div class="section-title">
+
+        <h2 data-i18n="nextWorkout">
+          Next Workout
+        </h2>
+
+      </div>
+
+      <div
+        class="next-workout-card"
+        onclick="showPage('workoutPage')"
+      >
+
+        <div>
+
+          <span id="nextWorkoutType">
+            Torso A
+          </span>
+
+          <strong id="nextWorkoutName">
+            Chest & Back
+          </strong>
+
+        </div>
+
+        <span class="arrow">
+          ←
+        </span>
+
+      </div>
+
+
+      <!-- ATTRIBUTES -->
+
+      <div class="section-title">
+
+        <h2 data-i18n="attributes">
+          Hunter Attributes
+        </h2>
+
+      </div>
+
+      <div class="attributes-card">
+
+        <div class="attribute">
+
+          <div class="attribute-head">
+            <span>💪 STR</span>
+            <strong id="attrStrength">
+              1
+            </strong>
+          </div>
+
+          <div class="attribute-bar">
+            <span id="strengthBar"></span>
+          </div>
+
+        </div>
+
+
+        <div class="attribute">
+
+          <div class="attribute-head">
+            <span>❤️ END</span>
+            <strong id="attrEndurance">
+              1
+            </strong>
+          </div>
+
+          <div class="attribute-bar">
+            <span id="enduranceBar"></span>
+          </div>
+
+        </div>
+
+
+        <div class="attribute">
+
+          <div class="attribute-head">
+            <span>🎯 CONS</span>
+            <strong id="attrConsistency">
+              1
+            </strong>
+          </div>
+
+          <div class="attribute-bar">
+            <span id="consistencyBar"></span>
+          </div>
+
+        </div>
+
+
+        <div class="attribute">
+
+          <div class="attribute-head">
+            <span>📈 VOL</span>
+            <strong id="attrVolume">
+              1
+            </strong>
+          </div>
+
+          <div class="attribute-bar">
+            <span id="volumeBar"></span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
 
 
     <!-- ================= WORKOUT ================= -->
-    <main id="workoutPage" class="page">
 
-        <div class="page-title-row">
-            <div>
-                <span class="eyebrow">TRAINING</span>
-                <h2>تمرين اليوم</h2>
-            </div>
+    <section id="workoutPage" class="page">
 
-            <button class="icon-btn" onclick="startRestTimer(90)">
-                ⏱️
-            </button>
-        </div>
+      <div class="page-header">
 
+        <div>
 
-        <!-- DAY SELECTOR -->
-        <div class="day-selector">
+          <span class="eyebrow">
+            TRAINING
+          </span>
 
-            <button data-day="Torso A" onclick="changeWorkoutDay('Torso A')">
-                <span>01</span>
-                Torso A
-            </button>
-
-            <button data-day="Limbs A" onclick="changeWorkoutDay('Limbs A')">
-                <span>02</span>
-                Limbs A
-            </button>
-
-            <button data-day="Torso B" onclick="changeWorkoutDay('Torso B')">
-                <span>03</span>
-                Torso B
-            </button>
-
-            <button data-day="Limbs B" onclick="changeWorkoutDay('Limbs B')">
-                <span>04</span>
-                Limbs B
-            </button>
+          <h1 data-i18n="workout">
+            Workout
+          </h1>
 
         </div>
 
+        <button
+          class="timer-button"
+          onclick="toggleTimer()"
+        >
+          ⏱
 
-        <!-- SESSION HEADER -->
-        <section class="session-card">
+          <span id="timerDisplay">
+            01:30
+          </span>
 
-            <div>
-                <span class="eyebrow">CURRENT SESSION</span>
-                <h3 id="workoutDayTitle">Torso A</h3>
-            </div>
+        </button>
 
-            <div class="session-progress-number">
-                <strong id="sessionPercent">0%</strong>
-                <span id="sessionSetsText">0 / 21 sets</span>
-            </div>
-
-        </section>
-
-        <div class="progress-track">
-            <div id="sessionProgressBar" class="progress-fill"></div>
-        </div>
+      </div>
 
 
-        <!-- EXERCISES -->
-        <section id="exerciseList" class="exercise-list">
-            <!-- JS -->
-        </section>
+      <!-- DAY SELECTOR -->
+
+      <div
+        id="dayTabs"
+        class="day-tabs"
+      ></div>
 
 
-        <!-- WORKOUT ACTIONS -->
-        <div class="workout-actions">
+      <!-- SESSION -->
 
-            <button class="save-btn" onclick="saveWorkoutDraft(true)">
-                <span>💾</span>
-                حفظ التمرين
-            </button>
+      <div class="session-header">
 
-            <button class="finish-btn" onclick="finishWorkout()">
-                <span>✓</span>
-                إنهاء التمرين
-            </button>
+        <div>
+
+          <h2 id="workoutDayTitle">
+            Torso A
+          </h2>
+
+          <p id="sessionSetsText">
+            0 / 19 sets
+          </p>
 
         </div>
 
-        <div class="autosave-status">
-            <span class="autosave-dot"></span>
-            <span id="autosaveText">Auto-save جاهز</span>
+        <strong id="sessionPercent">
+          0%
+        </strong>
+
+      </div>
+
+      <div class="progress-line">
+
+        <span id="sessionProgressBar"></span>
+
+      </div>
+
+
+      <!-- EXERCISES -->
+
+      <div id="exerciseList"></div>
+
+
+      <!-- ACTIONS -->
+
+      <div class="workout-actions">
+
+        <button
+          class="secondary-btn"
+          onclick="saveWorkoutDraft()"
+        >
+          💾
+          <span data-i18n="save">
+            حفظ
+          </span>
+        </button>
+
+        <button
+          class="primary-btn"
+          onclick="finishWorkout()"
+        >
+          ⚔
+          <span data-i18n="finish">
+            إنهاء المهمة
+          </span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ================= EVOLUTION ================= -->
+
+    <section id="progressPage" class="page">
+
+      <div class="page-header">
+
+        <div>
+
+          <span class="eyebrow">
+            EVOLUTION
+          </span>
+
+          <h1 data-i18n="bodyEvolution">
+            Body Evolution
+          </h1>
+
         </div>
 
-    </main>
+      </div>
 
 
-    <!-- ================= PROGRESS ================= -->
-    <main id="progressPage" class="page">
+      <div class="evolution-card">
 
-        <div class="page-title-row">
-            <div>
-                <span class="eyebrow">ANALYTICS</span>
-                <h2>Progress</h2>
-            </div>
+        <div
+          id="evolutionBackground"
+          class="evolution-background"
+        ></div>
 
-            <div class="mini-stat">
-                <strong id="progressPRCount">0</strong>
-                <span>PRs</span>
-            </div>
+        <div class="evolution-overlay"></div>
+
+        <div class="evolution-content">
+
+          <span id="evolutionRank">
+            NOVICE
+          </span>
+
+          <strong id="evolutionLevel">
+            LEVEL 1
+          </strong>
+
+          <small data-i18n="currentBody">
+            Current body image
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <!-- BODY PHOTOS -->
+
+      <div class="photo-grid">
+
+        <label class="photo-slot">
+
+          <input
+            type="file"
+            accept="image/*"
+            onchange="saveBodyPhoto('front', this.files[0])"
+          >
+
+          <span>📷</span>
+
+          <strong data-i18n="front">
+            Front
+          </strong>
+
+          <small id="frontPhotoName">
+            Add photo
+          </small>
+
+        </label>
+
+
+        <label class="photo-slot">
+
+          <input
+            type="file"
+            accept="image/*"
+            onchange="saveBodyPhoto('side', this.files[0])"
+          >
+
+          <span>📷</span>
+
+          <strong data-i18n="side">
+            Side
+          </strong>
+
+          <small id="sidePhotoName">
+            Add photo
+          </small>
+
+        </label>
+
+
+        <label class="photo-slot">
+
+          <input
+            type="file"
+            accept="image/*"
+            onchange="saveBodyPhoto('back', this.files[0])"
+          >
+
+          <span>📷</span>
+
+          <strong data-i18n="back">
+            Back
+          </strong>
+
+          <small id="backPhotoName">
+            Add photo
+          </small>
+
+        </label>
+
+      </div>
+
+
+      <!-- WEIGHT -->
+
+      <div class="section-title">
+
+        <h2 data-i18n="weightHistory">
+          Weight History
+        </h2>
+
+        <button
+          class="mini-btn"
+          onclick="addWeight()"
+        >
+          + kg
+        </button>
+
+      </div>
+
+      <div
+        id="weightHistory"
+        class="weight-history"
+      ></div>
+
+
+      <!-- ACHIEVEMENTS -->
+
+      <div class="section-title">
+
+        <h2 data-i18n="achievements">
+          Achievements
+        </h2>
+
+      </div>
+
+      <div
+        id="achievements"
+        class="achievement-grid"
+      ></div>
+
+    </section>
+
+
+
+    <!-- ================= CALORIES ================= -->
+
+    <section id="caloriesPage" class="page">
+
+      <div class="page-header">
+
+        <div>
+
+          <span class="eyebrow">
+            NUTRITION
+          </span>
+
+          <h1 data-i18n="calories">
+            Calories
+          </h1>
+
+        </div>
+
+      </div>
+
+
+      <div class="form-card">
+
+        <div class="form-grid">
+
+          <label>
+
+            <span data-i18n="age">
+              Age
+            </span>
+
+            <input
+              id="calAge"
+              type="number"
+              value="35"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span data-i18n="height">
+              Height
+            </span>
+
+            <input
+              id="calHeight"
+              type="number"
+              value="183"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span data-i18n="weight">
+              Weight
+            </span>
+
+            <input
+              id="calWeight"
+              type="number"
+              value="79"
+            >
+
+          </label>
+
+
+          <label>
+
+            <span data-i18n="sex">
+              Sex
+            </span>
+
+            <select id="calSex">
+
+              <option value="male">
+                Male
+              </option>
+
+              <option value="female">
+                Female
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label class="full">
+
+            <span data-i18n="activity">
+              Activity
+            </span>
+
+            <select id="calActivity">
+
+              <option value="1.2">
+                Sedentary
+              </option>
+
+              <option value="1.375">
+                Light
+              </option>
+
+              <option
+                value="1.55"
+                selected
+              >
+                Moderate
+              </option>
+
+              <option value="1.725">
+                High
+              </option>
+
+              <option value="1.9">
+                Very High
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label class="full">
+
+            <span data-i18n="goal">
+              Goal
+            </span>
+
+            <select id="calGoal">
+
+              <option value="cut">
+                Cut
+              </option>
+
+              <option value="maintain">
+                Maintain
+              </option>
+
+              <option
+                value="bulk"
+                selected
+              >
+                Lean Bulk
+              </option>
+
+            </select>
+
+          </label>
+
         </div>
 
 
-        <section class="section-card">
+        <button
+          class="primary-btn full-btn"
+          onclick="calculateCalories()"
+        >
+          🔥
 
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">PERSONAL RECORDS</span>
-                    <h3>أعلى أوزانك</h3>
-                </div>
-            </div>
+          <span data-i18n="calculate">
+            Calculate
+          </span>
 
-            <div id="prList" class="pr-list">
-                <!-- JS -->
-            </div>
+        </button>
 
-        </section>
+      </div>
 
 
-        <section class="section-card">
+      <div
+        id="calorieResult"
+        class="calorie-result hidden"
+      ></div>
 
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">BODYWEIGHT</span>
-                    <h3>وزن الجسم</h3>
-                </div>
+    </section>
 
-                <button class="small-btn" onclick="openWeightModal()">
-                    + إضافة
-                </button>
-            </div>
-
-            <div class="weight-display">
-                <strong id="currentBodyWeight">--</strong>
-                <span>KG</span>
-            </div>
-
-            <div id="weightHistory" class="weight-history">
-                <!-- JS -->
-            </div>
-
-        </section>
-
-    </main>
 
 
     <!-- ================= HISTORY ================= -->
-    <main id="historyPage" class="page">
 
-        <div class="page-title-row">
-            <div>
-                <span class="eyebrow">WORKOUT LOG</span>
-                <h2>History</h2>
-            </div>
+    <section id="historyPage" class="page">
+
+      <div class="page-header">
+
+        <div>
+
+          <span class="eyebrow">
+            LOG
+          </span>
+
+          <h1 data-i18n="history">
+            History
+          </h1>
+
         </div>
 
-        <section id="historyList" class="history-list">
-            <!-- JS -->
-        </section>
+      </div>
 
-    </main>
+
+      <div id="historyList"></div>
+
+    </section>
+
 
 
     <!-- ================= SETTINGS ================= -->
-    <main id="settingsPage" class="page">
 
-        <div class="page-title-row">
-            <div>
-                <span class="eyebrow">SYSTEM</span>
-                <h2>الإعدادات</h2>
-            </div>
-        </div>
+    <section id="settingsPage" class="page">
 
-        <section class="section-card settings-card">
+      <div class="page-header">
 
-            <button class="setting-row" onclick="exportData()">
-                <div>
-                    <strong>تصدير البيانات</strong>
-                    <span>احتفظ بنسخة احتياطية</span>
-                </div>
-                <span>📤</span>
-            </button>
+        <div>
 
-            <label class="setting-row">
-                <div>
-                    <strong>استيراد البيانات</strong>
-                    <span>استرجع نسخة سابقة</span>
-                </div>
-                <span>📥</span>
-                <input
-                    type="file"
-                    id="importFile"
-                    accept=".json"
-                    onchange="importData(event)"
-                    hidden
-                >
-            </label>
+          <span class="eyebrow">
+            SYSTEM
+          </span>
 
-            <button class="setting-row danger" onclick="resetData()">
-                <div>
-                    <strong>مسح البيانات</strong>
-                    <span>حذف كل سجل التمرين</span>
-                </div>
-                <span>🗑️</span>
-            </button>
-
-        </section>
-
-        <div class="app-info">
-            <strong>MO GYM PRO</strong>
-            <span>Personal Training System</span>
-            <small>Built for consistency, not perfection.</small>
-        </div>
-
-    </main>
-
-
-    <!-- ================= REST TIMER ================= -->
-    <div id="timerCard" class="timer-card">
-
-        <button class="timer-close" onclick="closeRestTimer()">×</button>
-
-        <span class="eyebrow">REST TIMER</span>
-
-        <div id="timerDisplay">01:30</div>
-
-        <div class="timer-progress">
-            <div id="timerBar"></div>
-        </div>
-
-        <div class="timer-presets">
-            <button onclick="startRestTimer(60)">60s</button>
-            <button onclick="startRestTimer(90)">90s</button>
-            <button onclick="startRestTimer(120)">120s</button>
-        </div>
-
-    </div>
-
-
-    <!-- ================= WEIGHT MODAL ================= -->
-    <div id="weightModal" class="modal-overlay">
-
-        <div class="modal">
-
-            <button class="modal-close" onclick="closeWeightModal()">×</button>
-
-            <span class="eyebrow">BODYWEIGHT</span>
-            <h3>سجل وزنك</h3>
-
-            <div class="weight-input">
-                <input
-                    type="number"
-                    id="bodyWeightInput"
-                    placeholder="79"
-                    step="0.1"
-                >
-                <span>KG</span>
-            </div>
-
-            <button class="primary-btn full" onclick="saveWeight()">
-                حفظ الوزن
-            </button>
+          <h1 data-i18n="settings">
+            Settings
+          </h1>
 
         </div>
 
-    </div>
+      </div>
 
 
-    <!-- ================= TOAST ================= -->
-    <div id="toast" class="toast">
-        <span id="toastIcon">✓</span>
-        <span id="toastMessage">تم الحفظ</span>
-    </div>
+      <div class="settings-list">
 
 
-    <!-- ================= BOTTOM NAV ================= -->
-    <nav class="bottom-nav">
+        <!-- LANGUAGE -->
 
-        <button class="nav-item active" data-page="dashboardPage" onclick="showPage('dashboardPage')">
-            <span>⌂</span>
-            <small>الرئيسية</small>
+        <div class="setting-row">
+
+          <div>
+
+            <strong data-i18n="language">
+              Language
+            </strong>
+
+            <small>
+              العربية / English
+            </small>
+
+          </div>
+
+          <select
+            id="languageSelect"
+            onchange="setLanguage(this.value)"
+          >
+
+            <option value="ar">
+              العربية
+            </option>
+
+            <option value="en">
+              English
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- THEME -->
+
+        <div class="setting-row">
+
+          <div>
+
+            <strong data-i18n="theme">
+              Theme
+            </strong>
+
+            <small data-i18n="themeDesc">
+              Choose your visual mode
+            </small>
+
+          </div>
+
+          <select
+            id="themeSelect"
+            onchange="setTheme(this.value)"
+          >
+
+            <option value="dark">
+              Dark Mode
+            </option>
+
+            <option value="light">
+              White Theme
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- TIMER -->
+
+        <div class="setting-row">
+
+          <div>
+
+            <strong data-i18n="timer">
+              Rest Timer
+            </strong>
+
+            <small>
+              Default 90 sec
+            </small>
+
+          </div>
+
+          <button
+            class="mini-btn"
+            onclick="setRestTimer(90)"
+          >
+            90s
+          </button>
+
+        </div>
+
+
+        <!-- EXPORT -->
+
+        <button
+          class="setting-action"
+          onclick="exportData()"
+        >
+          ⬇️
+
+          <span data-i18n="export">
+            Export Data
+          </span>
+
         </button>
 
-        <button class="nav-item" data-page="workoutPage" onclick="showPage('workoutPage')">
-            <span>🏋️</span>
-            <small>التمرين</small>
+
+        <!-- IMPORT -->
+
+        <label class="setting-action">
+
+          ⬆️
+
+          <span data-i18n="import">
+            Import Data
+          </span>
+
+          <input
+            type="file"
+            accept=".json"
+            hidden
+            onchange="importData(this.files[0])"
+          >
+
+        </label>
+
+
+        <!-- RESET -->
+
+        <button
+          class="setting-action danger"
+          onclick="resetApp()"
+        >
+
+          ♻️
+
+          <span data-i18n="reset">
+            Reset App
+          </span>
+
         </button>
 
-        <button class="nav-item" data-page="progressPage" onclick="showPage('progressPage')">
-            <span>📈</span>
-            <small>التقدم</small>
-        </button>
+      </div>
 
-        <button class="nav-item" data-page="historyPage" onclick="showPage('historyPage')">
-            <span>📅</span>
-            <small>السجل</small>
-        </button>
 
-        <button class="nav-item" data-page="settingsPage" onclick="showPage('settingsPage')">
-            <span>⚙️</span>
-            <small>إعدادات</small>
-        </button>
+      <p class="version">
+        MO GYM PRO 2.0
+      </p>
 
-    </nav>
+    </section>
+
+  </main>
+
+
+
+  <!-- ================= BOTTOM NAV ================= -->
+
+  <nav class="bottom-nav">
+
+    <button
+      class="nav-item active"
+      data-page="dashboardPage"
+      onclick="showPage('dashboardPage')"
+    >
+      ⌂
+      <small data-i18n="home">
+        Home
+      </small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="workoutPage"
+      onclick="showPage('workoutPage')"
+    >
+      ⚔
+      <small data-i18n="workout">
+        Workout
+      </small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="progressPage"
+      onclick="showPage('progressPage')"
+    >
+      🧍
+      <small data-i18n="evolution">
+        Evolution
+      </small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="caloriesPage"
+      onclick="showPage('caloriesPage')"
+    >
+      🔥
+      <small data-i18n="calories">
+        Calories
+      </small>
+    </button>
+
+
+    <button
+      class="nav-item"
+      data-page="settingsPage"
+      onclick="showPage('settingsPage')"
+    >
+      ⚙
+      <small data-i18n="settings">
+        Settings
+      </small>
+    </button>
+
+  </nav>
 
 </div>
+
+
+
+<!-- ================= REST TIMER ================= -->
+
+<div
+  id="timerCard"
+  class="timer-card hidden"
+>
+
+  <strong>
+    REST TIMER
+  </strong>
+
+  <b id="timerBig">
+    01:30
+  </b>
+
+  <div class="timer-progress">
+    <span id="timerBar"></span>
+  </div>
+
+  <div class="timer-presets">
+
+    <button onclick="setRestTimer(30)">
+      30s
+    </button>
+
+    <button onclick="setRestTimer(60)">
+      60s
+    </button>
+
+    <button onclick="setRestTimer(90)">
+      90s
+    </button>
+
+    <button onclick="setRestTimer(120)">
+      120s
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<!-- ================= TOAST ================= -->
+
+<div
+  id="toast"
+  class="toast"
+>
+
+  <span>
+    ⚡
+  </span>
+
+  <strong id="toastMessage"></strong>
+
+</div>
+
+
 
 <script src="app.js"></script>
 
